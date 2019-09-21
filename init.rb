@@ -1,8 +1,8 @@
 Redmine::Plugin.register :motiot do
   name 'Motiot plugin'
-  author 'Author name'
-  description 'This is a plugin for Redmine'
+  author 'afa.alone@gmail.com'
+  description 'Redmine motivation plugin'
   version '0.0.1'
-  url 'http://example.com/path/to/plugin'
-  author_url 'http://example.com/about'
+  url 'https://github.com/afa/motiot'
+  author_url 'https://github.com/afa'
 end
