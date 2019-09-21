@@ -1,4 +1,7 @@
-<%= form_for(:motivation, html: { class: 'form' }, url: create_motivation_report_path, method: :post) do |form| %>
+<%= content_for :header_tags do %>
+  <%= stylesheet_link_tag 'motivation' %>
+<% end %>
+<%= form_for(:motivation, html: { class: 'form' }, url: motivations_path, method: :post) do |form| %>
   <div class="tabular">
     <p>
       <label for="motivation_user"><%= t('.motivation.users') %></label>
@@ -84,7 +87,7 @@
   </table>
   <div class="gantt_hor_scroll"></div>
 </div>
-<%= form_for :motivation, url: create_motivation_report_path(format: :xlsx), method: :post do |form| %>
+<%= form_for :motivation, url: motivations_path(format: :xlsx), method: :post do |form| %>
     <%= hidden_field_tag(:user, @motivation.user, name: 'motivation[user]') %>
     <%= hidden_field_tag(:amount, @motivation.amount, name: 'motivation[amount]') %>
     <%= hidden_field_tag :date_from, @motivation.date_from, name: 'motivation[date_from]' %>

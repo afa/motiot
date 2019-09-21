@@ -1,4 +1,4 @@
-require 'range'
+# require 'range'
 
 module Gantt
   module Baseline

@@ -4,12 +4,14 @@ ActiveSupport::Dependencies.autoload_paths << File.join(app_dir, 'services')
 ActiveSupport::Dependencies.autoload_paths << File.join(app_dir, 'forms')
 ActiveSupport::Dependencies.autoload_paths << File.join(app_dir, 'structs')
 
+Rails.application.config.assets.precompile += %w[motivation.css]
+
 Rails.application.configure do
   config.reform.enable_active_model_builder_methods = true
   config.reform.validations = :dry
 end
 Redmine::MenuManager.map :top_menu do |menu|
-  menu.push(:motivation, { controller: 'motivations', action: 'index' },
+  menu.push(:motivations, { controller: 'motivations', action: 'index' },
             caption: :label_motivation,
             # after: :documents,
             html: { class: 'icon icon-stats' },

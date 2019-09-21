@@ -1,0 +1,24 @@
+# rus
+ru:
+  motivations:
+    index:
+      submit_button: Посчитать
+      motivation:
+        users: Кураторы
+        amount: Сумма
+        date_from: C
+        date_to: по
+        from: с
+        to: по
+        for: Для
+    create:
+      submit_button: Посчитать
+      motivation:
+        users: Кураторы
+        amount: Сумма
+        date_from: C
+        date_to: по
+        from: с
+        to: по
+        for: Для
+      xls_button: Сохранить в XLS

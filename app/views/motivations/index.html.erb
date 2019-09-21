@@ -1,4 +1,7 @@
-<%= form_for(:motivation, html: { class: 'form' }, url: create_motivation_report_path, method: :post) do |form| %>
+<%= content_for :header_tags do %>
+  <%= stylesheet_link_tag 'motivation' %>
+<% end %>
+<%= form_for(:motivation, html: { class: 'form' }, url: motivations_path, method: :post) do |form| %>
   <div class="tabular">
     <p>
       <label for="motivation_user"><%= t('.motivation.users') %></label>

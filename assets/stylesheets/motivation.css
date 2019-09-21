@@ -1,0 +1,11 @@
+/*
+ * = require_self
+ */
+
+.motivation.info {
+  width: 100%;
+  max-width: 100%;
+  span {
+    padded-right: 10px;
+  }
+}
