@@ -6,3 +6,5 @@ Redmine::Plugin.register :motiot do
   url 'https://github.com/afa/motiot'
   author_url 'https://github.com/afa'
 end
+
+require_relative 'after_init'

@@ -1,0 +1,142 @@
+<%= form_for(:motivation, html: { class: 'form' }, url: create_motivation_report_path, method: :post) do |form| %>
+  <div class="tabular">
+    <p>
+      <label for="motivation_user"><%= t('.motivation.users') %></label>
+      <%= form.select(:user, options_from_collection_for_select(@users, :id, :name, @motivation.user), class: 'select-small', prompt: t('.select_user')) %>
+    </p>
+    <p>
+      <label for="motivation_amount"><%= t('.motivation.amount') %></label>
+      <%= form.number_field :amount, step: '0.01' %>
+    </p>
+    <p>
+      <label for="motivation_date_from"><%= t('.motivation.date_from') %></label>
+      <%= form.date_field :date_from, value: @motivation.model.date_from %>
+      <label for="motivation_date_to"><%= t('.motivation.date_to') %></label>
+      <%= form.date_field :date_to, value: @motivation.model.date_to %>
+    </p>
+    <div>
+      <%= form.submit t('.submit_button') %>
+    </div>
+  </div>
+<% end %>
+<div class="motivation info" style="width: 100%; max-width: 100%;">
+  <span><%= t('.motivation.for') %><%= @motivation.model.user.name %></span>
+  <span><%= t('.motivation.amount') %><%= @motivation.model.amount %></span>
+  <span><%= t('.motivation.from') %><%= I18n.l(@motivation.model.date_from) %></span>
+  <span><%= t('.motivation.to') %><%= I18n.l(@motivation.model.date_to) %></span>
+</div>
+
+<div class="motivation report" style="overflow-x: scroll; clear: both;">
+  <table class="table list autoscroll">
+    <thead>
+      <tr>
+        <th><%= t('.motivation.head_projects') %></th>
+        <% (@motivation.model.date_from..@motivation.model.date_to).each do |date| %>
+          <th><%= date %></th>
+        <%end%>
+      </tr>
+    </thead>
+    <tbody>
+      <%  daily_pay = @motivation.model.amount.to_f / (@motivation.model.date_from..@motivation.model.date_to).to_a.size %>
+      <% @motivation.projects.each do |project| %>
+        <tr>
+          <td><%= project.name %></td>
+          <% (@motivation.model.date_from..@motivation.model.date_to).each do |date| %>
+            <td>
+              <% pcount = @motivation.data.value![date]&.values&.count { |item| !item.nil? }.to_f %>
+              <% if @motivation.data.value!.dig(date, project.id).nil? %>
+                &mdash;
+              <% elsif @motivation.data.value!.dig(date, project.id) %>
+                <%= format('%.02f', daily_pay.to_f / pcount.to_f) %>
+              <% else %>
+                0
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <%end%>
+      <% total = 0.0 %>
+      <tr>
+        <td><%= t('.motivation.total') %></td>
+        <% (@motivation.model.date_from..@motivation.model.date_to).each do |date| %>
+          <td>
+            <% pcount = @motivation.data.value![date]&.values&.count { |item| !item.nil? }.to_f %>
+            <% pactive = @motivation.data.value![date]&.values&.count { |item| item }.to_f %>
+            <% if pcount == 0.0 %>
+              &mdash;
+            <% else %>
+              <% value = daily_pay.to_f * pactive / pcount %>
+              <% total += value %>
+              <%= format('%.02f', value) %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+      <tr>
+        <td>
+          <%= t('.motivation.for_range') %>
+        </td>
+        <td>
+          <%= format('%.02f', total) %>
+        </td>
+      <tr>
+    </tbody>
+  </table>
+  <div class="gantt_hor_scroll"></div>
+</div>
+<%= form_for :motivation, url: create_motivation_report_path(format: :xlsx), method: :post do |form| %>
+    <%= hidden_field_tag(:user, @motivation.user, name: 'motivation[user]') %>
+    <%= hidden_field_tag(:amount, @motivation.amount, name: 'motivation[amount]') %>
+    <%= hidden_field_tag :date_from, @motivation.date_from, name: 'motivation[date_from]' %>
+    <%= hidden_field_tag :date_to, @motivation.date_to, name: 'motivation[date_to]' %>
+    <%= form.submit t('.xls_button') %>
+<% end %>
+<h3>Report</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Date </th>
+      <th>Curated </th>
+      <th>Project </th>
+      <th>Baseline </th>
+      <th>Planned </th>
+      <th>Real </th>
+      <th>Closed </th>
+      <th>Expired </th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% (@report[:author].keys + @report[:curator].keys).uniq.sort.each do |prj| %>
+      <% ((@report.dig(:author, prj) || Set.new) + (@report.dig(:curator, prj) || Set.new)).sort.each do |date| %>
+        <tr>
+          <td><%= date.to_s(:db) %></td>
+          <td>
+            <%= (@report.dig(:author, prj)&.include?(date) ? 'R' : '') + (@report.dig(:curator, prj)&.include?(date) ? 'C' : '') %>
+          </td>
+          <td><%= Project.find(prj).name %></td>
+          <td>
+            <%= @report.dig(:baseline, prj, date) %>
+          </td>
+          <td>
+            <%= @report.dig(:planned, prj, date)&.select { |a| a.keys.first }&.map { |ass| link_to(ass.keys.first.to_s, issue_path(ass.keys.first)) + '-' + link_to(ass.values.first.to_s, issue_path(ass.values.first)) }&.join(' ').to_s.html_safe %>
+          </td>
+          <td>
+            <%= @report.dig(:real, prj, date)&.select { |a| a.present? }&.map { |iss| link_to iss.to_s, issue_path(iss) }&.join(' ').to_s.html_safe %>
+          </td>
+          <td>
+            <%= @report.dig(:closed, prj, date)&.select { |a| a.present? }&.map { |iss| link_to iss.to_s, issue_path(iss) }&.join(' ').to_s.html_safe %>
+          </td>
+          <td>
+            <%= @report.dig(:expired, prj, date)&.select { |a| a.present? }&.map { |iss| link_to iss.to_s, issue_path(iss) }&.join(' ').to_s.html_safe %>
+          </td>
+          <td>
+            <%= @report.dig(:result, prj, date, :work) ? 'Y' : 'N' %>
+          </td>
+
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+

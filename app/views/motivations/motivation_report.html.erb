@@ -1,0 +1,21 @@
+<%= form_for(:motivation, html: { class: 'form' }, url: create_motivation_report_path, method: :post) do |form| %>
+  <div class="tabular">
+    <p>
+      <label for="motivation_user"><%= t('.motivation.users') %></label>
+      <%= form.select(:user, options_from_collection_for_select(@users, :id, :name, @user&.id), class: 'select-small', prompt: t('.select_user')) %>
+    </p>
+    <p>
+      <label for="motivation_amount"><%= t('.motivation.amount') %></label>
+      <%= form.number_field :amount, step: '0.01' %>
+    </p>
+    <p>
+      <label for="motivation_date_from"><%= t('.motivation.date_from') %></label>
+      <%= form.date_field :date_from %>
+      <label for="motivation_date_to"><%= t('.motivation.date_to') %></label>
+      <%= form.date_field :date_to %>
+    </p>
+    <div>
+      <%= form.submit t('.submit_button') %>
+    </div>
+  </div>
+<% end %>
